@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -74,6 +75,38 @@ void main() {
         return directory.parent.absolute.path;
       });
       expect(p.canonicalize(result), p.canonicalize(dir.absolute.path));
+    });
+
+    test('Nested invocations to withCurrentDirectory should work', () async {
+      final parentDir = await Directory(p.join(dir.path, 'inner')).create();
+      await File(p.join(parentDir.path, 'nested.txt')).create();
+
+      final result = await withCurrentDirectory(dir.path, () async {
+        return await withCurrentDirectory('inner', () async {
+          final file = File('nested.txt');
+          return await file.exists();
+        });
+      });
+      expect(result, isTrue);
+    });
+
+    test('Can change current Directory within withCurrentDirectory', () async {
+      final initialCurrentDir = Directory.current.path;
+      final lock = StreamController();
+      final globalCurrentDir = Future(() async {
+        await lock.stream.first;
+        return Directory.current.path;
+      });
+      final result = await withCurrentDirectory(dir.path, () async {
+        Directory.current = dir.parent.path;
+        lock.add(true);
+        // let globalCurrentDir be set before we complete this lambda
+        await Future.delayed(Duration(milliseconds: 25));
+        return await Directory(p.basename(dir.path)).exists();
+      });
+
+      expect(result, isTrue);
+      expect(await globalCurrentDir, equals(initialCurrentDir));
     });
   });
 }
