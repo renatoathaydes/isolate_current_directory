@@ -3,13 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:isolate_current_directory/src/directory.dart';
 import 'package:path/path.dart' as p;
 
-String absPath(String path, [String? dir]) {
-  return p.isAbsolute(path)
-      ? path
-      : p.join(dir ?? Directory.current.path, path);
-}
+import 'utils.dart';
 
 class IsolatedFile implements File {
   @override
@@ -132,8 +129,7 @@ class IsolatedFile implements File {
   }
 
   @override
-  // TODO: implement (requires JBuildDirectory)
-  Directory get parent => throw UnimplementedError();
+  Directory get parent => IsolatedDirectory.of(p.dirname(path), _parentZone);
 
   @override
   Future<Uint8List> readAsBytes() {

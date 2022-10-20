@@ -16,9 +16,9 @@ library isolate_current_directory;
 import 'dart:async';
 import 'dart:io';
 
-import 'isolate_current_directory.dart';
-
-export 'src/file.dart';
+import 'src/directory.dart';
+import 'src/file.dart';
+import 'src/utils.dart';
 
 class _ZoneVariables {
   Directory currentDirectory;
@@ -42,7 +42,7 @@ FutureOr<T> withCurrentDirectory<T>(
   final zoneVariables = _ZoneVariables(_dir(absPath(directory)));
 
   return IOOverrides.runZoned(() async => await action(),
-      createDirectory: (p) => parentZone.runUnary(_dir, p),
+      createDirectory: (p) => IsolatedDirectory.of(p, parentZone),
       createFile: (p) => IsolatedFile.of(p, parentZone),
       stat: (p) => parentZone.runBinary(_stat, directory, p),
       statSync: (p) => parentZone.runBinary(_statSync, directory, p),
