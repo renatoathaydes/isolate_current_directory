@@ -28,16 +28,24 @@ class _ZoneVariables {
 
 Directory _dir(String path) => Directory(path);
 
-Future<T> withCurrentDirectory<T>(
-    String directory, Future<T> Function() action) {
+Future<FileStat> _stat(String dir, String path) {
+  return FileStat.stat(absPath(path, dir));
+}
+
+FileStat _statSync(String dir, String path) {
+  return FileStat.statSync(absPath(path, dir));
+}
+
+FutureOr<T> withCurrentDirectory<T>(
+    String directory, FutureOr<T> Function() action) {
   final parentZone = Zone.current;
   final zoneVariables = _ZoneVariables(_dir(absPath(directory)));
 
   return IOOverrides.runZoned(() async => await action(),
       createDirectory: (p) => parentZone.runUnary(_dir, p),
       createFile: (p) => IsolatedFile.of(p, parentZone),
-      // stat: (p) => parentZone.runBinary(_stat, currentDir, p),
-      // statSync: (p) => parentZone.runBinary(_statSync, currentDir, p),
+      stat: (p) => parentZone.runBinary(_stat, directory, p),
+      statSync: (p) => parentZone.runBinary(_statSync, directory, p),
       getCurrentDirectory: () => zoneVariables.currentDirectory,
       setCurrentDirectory: (path) {
         zoneVariables.currentDirectory = parentZone.runUnary(_dir, path);

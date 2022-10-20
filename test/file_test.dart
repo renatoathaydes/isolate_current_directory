@@ -72,5 +72,15 @@ void main() {
       expect(await file.exists(), isFalse);
       expect(await File(p.join(dir.path, 'zort.txt')).exists(), isTrue);
     });
+
+    test('Can get file stats', () async {
+      await File(p.join(dir.path, 's')).writeAsString('  ');
+      final result = await withCurrentDirectory(dir.path, () async {
+        final file = File('s');
+        final stat = await file.stat();
+        return {'type': stat.type, 'size': stat.size};
+      });
+      expect(result, {'type': FileSystemEntityType.file, 'size': 2});
+    });
   });
 }

@@ -5,8 +5,10 @@ import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
 
-String absPath(String path) {
-  return p.isAbsolute(path) ? path : p.join(Directory.current.path, path);
+String absPath(String path, [String? dir]) {
+  return p.isAbsolute(path)
+      ? path
+      : p.join(dir ?? Directory.current.path, path);
 }
 
 class IsolatedFile implements File {
