@@ -16,12 +16,6 @@ class IsolatedFile implements File {
 
   IsolatedFile._(this.path, this._parentZone);
 
-  static File wrapFile(File file, Zone parentZone) {
-    return file.isAbsolute || file is IsolatedFile
-        ? file
-        : IsolatedFile._(file.path, parentZone);
-  }
-
   static File of(String path, Zone parentZone) {
     return IsolatedFile._(path, parentZone);
   }

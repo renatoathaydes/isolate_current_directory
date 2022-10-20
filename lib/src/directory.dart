@@ -13,12 +13,6 @@ class IsolatedDirectory implements Directory {
 
   IsolatedDirectory._(this.path, this._parentZone);
 
-  static Directory wrapDirectory(Directory directory, Zone parentZone) {
-    return directory.isAbsolute || directory is IsolatedDirectory
-        ? directory
-        : IsolatedDirectory._(directory.path, parentZone);
-  }
-
   static Directory of(String path, Zone parentZone) {
     return IsolatedDirectory._(path, parentZone);
   }
