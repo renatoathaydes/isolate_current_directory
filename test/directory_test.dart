@@ -67,5 +67,13 @@ void main() {
       });
       expect(result, {'type': FileSystemEntityType.directory});
     });
+
+    test('Can get parent Directory', () async {
+      final result = await withCurrentDirectory(dir.path, () async {
+        final directory = Directory('abc');
+        return directory.parent.absolute.path;
+      });
+      expect(p.canonicalize(result), p.canonicalize(dir.absolute.path));
+    });
   });
 }

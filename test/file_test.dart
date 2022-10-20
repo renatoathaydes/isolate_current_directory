@@ -83,5 +83,13 @@ void main() {
       });
       expect(result, {'type': FileSystemEntityType.file, 'size': 2});
     });
+
+    test('Can get parent Directory', () async {
+      final result = await withCurrentDirectory(dir.path, () async {
+        final file = File('abc.txt');
+        return file.parent.absolute.path;
+      });
+      expect(p.canonicalize(result), p.canonicalize(dir.absolute.path));
+    });
   });
 }
