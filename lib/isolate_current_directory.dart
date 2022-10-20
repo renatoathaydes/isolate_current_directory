@@ -36,6 +36,15 @@ FileStat _statSync(String dir, String path) {
   return FileStat.statSync(absPath(path, dir));
 }
 
+/// Run the given [action] using [directory] as the working directory.
+///
+/// Within the scope of [action], any [File], [Directory] and [Link]
+/// created will be relative to [directory]. [FileStat] methods will also
+/// work as expected.
+///
+/// `Directory.current` is scoped within the [action] and will return the given
+/// [directory] unless modified within [action]. The global value of
+/// `Directory.current` is not affected by this function.
 FutureOr<T> withCurrentDirectory<T>(
     String directory, FutureOr<T> Function() action) {
   final parentZone = Zone.current;
