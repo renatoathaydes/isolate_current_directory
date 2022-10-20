@@ -24,6 +24,9 @@ class IsolatedDirectory implements Directory {
   }
 
   @override
+  String toString() => 'IsolatedDirectory{path: $path}';
+
+  @override
   Directory get absolute {
     final wd = Directory.current.path;
     return _parentZone.run(() => Directory(p.join(wd, path)));
