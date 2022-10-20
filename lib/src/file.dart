@@ -30,33 +30,37 @@ class IsolatedFile implements File {
   }
 
   @override
-  Future<File> copy(String newPath) {
-    return absolute.copy(absPath(newPath));
+  Future<File> copy(String newPath) async {
+    await absolute.copy(absPath(newPath));
+    return IsolatedFile.of(newPath, _parentZone);
   }
 
   @override
   File copySync(String newPath) {
-    return absolute.copySync(absPath(newPath));
+    absolute.copySync(absPath(newPath));
+    return IsolatedFile.of(newPath, _parentZone);
   }
 
   @override
-  Future<File> create({bool recursive = false}) {
-    return absolute.create(recursive: recursive);
+  Future<File> create({bool recursive = false}) async {
+    await absolute.create(recursive: recursive);
+    return this;
   }
 
   @override
   void createSync({bool recursive = false}) {
-    return absolute.createSync(recursive: recursive);
+    absolute.createSync(recursive: recursive);
   }
 
   @override
-  Future<FileSystemEntity> delete({bool recursive = false}) {
-    return absolute.delete(recursive: recursive);
+  Future<FileSystemEntity> delete({bool recursive = false}) async {
+    await absolute.delete(recursive: recursive);
+    return this;
   }
 
   @override
   void deleteSync({bool recursive = false}) {
-    return absolute.deleteSync(recursive: recursive);
+    absolute.deleteSync(recursive: recursive);
   }
 
   @override
@@ -156,13 +160,15 @@ class IsolatedFile implements File {
   }
 
   @override
-  Future<File> rename(String newPath) {
-    return absolute.rename(absPath(newPath));
+  Future<File> rename(String newPath) async {
+    await absolute.rename(absPath(newPath));
+    return IsolatedFile.of(newPath, _parentZone);
   }
 
   @override
   File renameSync(String newPath) {
-    return absolute.renameSync(absPath(newPath));
+    absolute.renameSync(absPath(newPath));
+    return IsolatedFile.of(newPath, _parentZone);
   }
 
   @override
@@ -216,23 +222,25 @@ class IsolatedFile implements File {
 
   @override
   Future<File> writeAsBytes(List<int> bytes,
-      {FileMode mode = FileMode.write, bool flush = false}) {
-    return absolute.writeAsBytes(bytes, mode: mode, flush: flush);
+      {FileMode mode = FileMode.write, bool flush = false}) async {
+    await absolute.writeAsBytes(bytes, mode: mode, flush: flush);
+    return this;
   }
 
   @override
   void writeAsBytesSync(List<int> bytes,
       {FileMode mode = FileMode.write, bool flush = false}) {
-    return absolute.writeAsBytesSync(bytes, mode: mode, flush: flush);
+    absolute.writeAsBytesSync(bytes, mode: mode, flush: flush);
   }
 
   @override
   Future<File> writeAsString(String contents,
       {FileMode mode = FileMode.write,
       Encoding encoding = utf8,
-      bool flush = false}) {
-    return absolute.writeAsString(contents,
+      bool flush = false}) async {
+    await absolute.writeAsString(contents,
         mode: mode, encoding: encoding, flush: flush);
+    return this;
   }
 
   @override

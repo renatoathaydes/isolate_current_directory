@@ -49,12 +49,13 @@ void main() {
 
     test('Can rename directory', () async {
       final directory = await Directory(p.join(dir.path, 'bar')).create();
-      await withCurrentDirectory(dir.path, () async {
+      final renamedDir = await withCurrentDirectory(dir.path, () async {
         final directory = Directory('bar');
-        await directory.rename('zort');
+        return await directory.rename('zort');
       });
       expect(await directory.exists(), isFalse);
       expect(await Directory(p.join(dir.path, 'zort')).exists(), isTrue);
+      expect(renamedDir.path, equals('zort'));
     });
 
     test('Can get directory stats', () async {

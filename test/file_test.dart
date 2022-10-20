@@ -65,12 +65,13 @@ void main() {
 
     test('Can rename file', () async {
       final file = await File(p.join(dir.path, 'bar.txt')).create();
-      await withCurrentDirectory(dir.path, () async {
+      final renamedFile = await withCurrentDirectory(dir.path, () async {
         final file = File('bar.txt');
-        await file.rename('zort.txt');
+        return await file.rename('zort.txt');
       });
       expect(await file.exists(), isFalse);
       expect(await File(p.join(dir.path, 'zort.txt')).exists(), isTrue);
+      expect(renamedFile.path, equals('zort.txt'));
     });
 
     test('Can get file stats', () async {
