@@ -21,7 +21,9 @@ import 'isolate_current_directory.dart';
 export 'src/file.dart';
 
 class _ZoneVariables {
-  Directory currentDirectory = Directory('.');
+  Directory currentDirectory;
+
+  _ZoneVariables(this.currentDirectory);
 }
 
 Directory _dir(String path) => Directory(path);
@@ -29,8 +31,7 @@ Directory _dir(String path) => Directory(path);
 Future<T> withCurrentDirectory<T>(
     String directory, Future<T> Function() action) {
   final parentZone = Zone.current;
-  final zoneVariables = _ZoneVariables()
-    ..currentDirectory = _dir(absPath(directory));
+  final zoneVariables = _ZoneVariables(_dir(absPath(directory)));
 
   return IOOverrides.runZoned(() async => await action(),
       createDirectory: (p) => parentZone.runUnary(_dir, p),
