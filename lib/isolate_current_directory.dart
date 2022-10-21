@@ -36,15 +36,23 @@ FileStat _statSync(String dir, String path) {
   return FileStat.statSync(absPath(path, dir));
 }
 
-/// Run the given [action] using [directory] as the working directory.
+/// Run the given [action] using the given [directory] as the working directory.
 ///
 /// Within the scope of [action], any [File], [Directory] and [Link]
 /// created will be relative to [directory]. [FileStat] methods will also
 /// work as expected.
 ///
+/// The actual working directory used within the scope of [action] is the value
+/// of [directory] if it's an absolute path, or else is computed
+/// by immediately reading [Directory.current], then appending [directory] to
+/// that.
+///
 /// `Directory.current` is scoped within the [action] and will return the given
 /// [directory] unless modified within [action]. The global value of
-/// `Directory.current` is not affected by this function.
+/// `Directory.current` cannot, at least easily, be affected by this function,
+/// so modifications are only visible within [action]'s scope. Notice that
+/// the global value can still be accessed via [Zone.root], so this feature
+/// cannot be used for security.
 FutureOr<T> withCurrentDirectory<T>(
     String directory, FutureOr<T> Function() action) {
   final parentZone = Zone.current;
