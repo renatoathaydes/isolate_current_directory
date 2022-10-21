@@ -1,29 +1,18 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:isolate_current_directory/isolate_current_directory.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
+import 'test_helper.dart';
+
 void main() {
   group('File', () {
-    final tempDir = Directory(p.join('test', 'temp'));
     late Directory dir;
+    final dirFuture = addSetupAndTearDownThenGetDir();
 
     setUpAll(() async {
-      expect(await tempDir.exists(), isTrue);
-      expect((await tempDir.list().toList()).map((e) => e.path).toList(),
-          equals([p.join('test', 'temp', '.gitignore')]));
-    });
-
-    setUp(() async {
-      dir = Directory(
-          p.join(tempDir.path, Random().nextInt(999999999).toString()));
-      await dir.create();
-    });
-
-    tearDown(() async {
-      await dir.delete(recursive: true);
+      dir = await dirFuture;
     });
 
     test('Can create, read, check file exists', () async {

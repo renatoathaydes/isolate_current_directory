@@ -49,6 +49,8 @@ scope.
 
 ## Caveats
 
+### Process
+
 Unfortunately, methods from `Process` do not honour the scoped `Directory.current` value by default.
 
 For this reason, when using `Process`, you must pass in the `workingDirectory` argument explicitly:
@@ -57,7 +59,15 @@ For this reason, when using `Process`, you must pass in the `workingDirectory` a
 Process.start('cmd', const ['args'], workingDirectory: Directory.current.path);
 ```
 
+### Performance
+
 Another possible issue is performance. When a `FileSystemEntity` is created within the scope of `withCurrentDirectory`,
 a custom implementation of the `dart:io` type (`File`, `Directory`, `Link`) is created which will check at each
 operation what's the scoped value of `Directory.current`, which may have a non-negligible cost if this happens in
 the hot path of an application.
+
+### Link bugs
+
+Links mostly work, but mysteriously, `exists()` doesn't seem to.
+
+See [link_test.dart](test/link_test.dart).

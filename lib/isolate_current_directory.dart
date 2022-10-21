@@ -18,6 +18,7 @@ import 'dart:io';
 
 import 'src/directory.dart';
 import 'src/file.dart';
+import 'src/link.dart';
 import 'src/utils.dart';
 
 class _ZoneVariables {
@@ -61,6 +62,7 @@ FutureOr<T> withCurrentDirectory<T>(
   return IOOverrides.runZoned(() async => await action(),
       createDirectory: (p) => IsolatedDirectory.of(p, parentZone),
       createFile: (p) => IsolatedFile.of(p, parentZone),
+      createLink: (p) => IsolatedLink.of(p, parentZone),
       stat: (p) => parentZone.runBinary(_stat, directory, p),
       statSync: (p) => parentZone.runBinary(_statSync, directory, p),
       getCurrentDirectory: () => zoneVariables.currentDirectory,
