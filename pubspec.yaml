@@ -1,5 +1,5 @@
 name: isolate_current_directory
-description: Support for Isolate-respecting Directory.current.
+description: Support for isolated Directory.current.
 version: 1.0.0
 homepage: https://github.com/renatoathaydes/isolate_current_directory
 
