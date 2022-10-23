@@ -22,14 +22,14 @@ void main() {
         await directory.create();
         return {
           'exists': await directory.exists(),
-          'absPath': directory.absolute.path,
+          'absPath': directory.absolutePath,
           'path': directory.path,
         };
       });
 
       expect(result, {
         'exists': true,
-        'absPath': p.join(dir.absolute.path, 'hello'),
+        'absPath': p.join(dir.absolutePath, 'hello'),
         'path': 'hello',
       });
 
@@ -61,9 +61,9 @@ void main() {
     test('Can get parent Directory', () async {
       final result = await withCurrentDirectory(dir.path, () async {
         final directory = Directory('abc');
-        return directory.parent.absolute.path;
+        return directory.parent.absolutePath;
       });
-      expect(p.canonicalize(result), p.canonicalize(dir.absolute.path));
+      expect(p.canonicalize(result), p.canonicalize(dir.absolutePath));
     });
 
     test('Nested invocations to withCurrentDirectory should work', () async {

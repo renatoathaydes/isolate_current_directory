@@ -23,7 +23,7 @@ void main() {
         final text = await File(await link.target()).readAsString();
         return {
           // 'exists': await link.exists(),
-          'absPath': link.absolute.path,
+          'absPath': link.absolutePath,
           'text': text,
         };
       });
@@ -31,7 +31,7 @@ void main() {
       expect(result, {
         // FIXME why is this false?!
         // 'exists': true,
-        'absPath': p.join(dir.absolute.path, 'hi.txt.link'),
+        'absPath': p.join(dir.absolutePath, 'hi.txt.link'),
         'text': 'hello world',
       });
 
@@ -50,7 +50,7 @@ void main() {
         final text = await File(p.join('dir-link', 'f.txt')).readAsString();
         return {
           // 'exists': await link.exists(),
-          'absPath': link.absolute.path,
+          'absPath': link.absolutePath,
           'text': text,
         };
       });
@@ -58,7 +58,7 @@ void main() {
       expect(result, {
         // FIXME why is this false?!
         // 'exists': true,
-        'absPath': p.join(dir.absolute.path, 'dir-link'),
+        'absPath': p.join(dir.absolutePath, 'dir-link'),
         'text': 'foo bar',
       });
 
@@ -77,7 +77,7 @@ void main() {
       });
 
       expect(p.canonicalize(result),
-          p.canonicalize(p.join(dir.absolute.path, 'dir2', 'foo.txt')));
+          p.canonicalize(p.join(dir.absolutePath, 'dir2', 'foo.txt')));
     });
   });
 }

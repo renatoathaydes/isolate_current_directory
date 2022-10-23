@@ -19,3 +19,22 @@ Future<Directory> addSetupAndTearDownThenGetDir() async {
 
   return tempDir;
 }
+
+/// On Windows, paths seem to sometimes include a lowercase drive,
+/// sometimes an uppercase drive. So we need to fix that.
+String Function(String) _fixPathOnWindows = Platform.isWindows
+    ? (path) {
+        if (p.isAbsolute(path)) {
+          final idx = path.indexOf(':');
+          if (idx > 0) {
+            final drive = path.substring(0, idx);
+            return '${drive.toLowerCase()}${path.substring(idx)}';
+          }
+        }
+        return path;
+      }
+    : (path) => path;
+
+extension PathExtension on FileSystemEntity {
+  String get absolutePath => _fixPathOnWindows(absolute.path);
+}

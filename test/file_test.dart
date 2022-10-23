@@ -22,14 +22,14 @@ void main() {
         final text = await file.readAsString();
         return {
           'exists': await file.exists(),
-          'absPath': file.absolute.path,
+          'absPath': file.absolutePath,
           'text': text,
         };
       });
 
       expect(result, {
         'exists': true,
-        'absPath': p.join(dir.absolute.path, 'hi.txt'),
+        'absPath': p.join(dir.absolutePath, 'hi.txt'),
         'text': 'hello world',
       });
 
@@ -76,9 +76,9 @@ void main() {
     test('Can get parent Directory', () async {
       final result = await withCurrentDirectory(dir.path, () async {
         final file = File('abc.txt');
-        return file.parent.absolute.path;
+        return file.parent.absolutePath;
       });
-      expect(p.canonicalize(result), p.canonicalize(dir.absolute.path));
+      expect(p.canonicalize(result), p.canonicalize(dir.absolutePath));
     });
   });
 }
