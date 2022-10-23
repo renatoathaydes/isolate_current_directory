@@ -1,6 +1,10 @@
 # isolate_current_directory
 
-This library exports a single function, `withCurrentDirectory`, which can change [`Directory.current`](https://api.dart.dev/stable/2.18.3/dart-io/Directory/current.html)
+![GitHub Actions](https://github.com/renatoathaydes/isolate_current_directory/workflows/CI/badge.svg)
+[![pub package](https://img.shields.io/pub/v/isolate_current_directory.svg)](https://pub.dev/packages/isolate_current_directory)
+
+This library exports a single function, `withCurrentDirectory`, which can
+change [`Directory.current`](https://api.dart.dev/stable/2.18.3/dart-io/Directory/current.html)
 (the working directory) within the scope of a lambda, but not the global value.
 
 That means that using this function, it's possible to write concurrent Dart code that executes in different
