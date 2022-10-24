@@ -73,6 +73,25 @@ void main() {
       expect(result, {'type': FileSystemEntityType.file, 'size': 2});
     });
 
+    test('Nested invocations to withCurrentDirectory should work', () async {
+      final parentDir = await Directory(p.join(dir.path, 'inner')).create();
+      await File(p.join(parentDir.path, 'nested.txt')).writeAsString('abc');
+
+      final result = await withCurrentDirectory(dir.path, () async {
+        return await withCurrentDirectory('inner', () async {
+          final file = File('nested.txt');
+          final stat = await file.stat();
+          return {
+            'type': stat.type,
+            'size': stat.size,
+            'exists': await file.exists()
+          };
+        });
+      });
+      expect(result,
+          {'type': FileSystemEntityType.file, 'size': 3, 'exists': true});
+    });
+
     test('Can get parent Directory', () async {
       final result = await withCurrentDirectory(dir.path, () async {
         final file = File('abc.txt');

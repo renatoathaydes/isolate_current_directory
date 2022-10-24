@@ -1,6 +1,6 @@
 name: isolate_current_directory
 description: Support for isolated Directory.current.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/renatoathaydes/isolate_current_directory
 
 environment:

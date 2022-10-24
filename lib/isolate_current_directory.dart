@@ -63,8 +63,10 @@ FutureOr<T> withCurrentDirectory<T>(
       createDirectory: (p) => IsolatedDirectory.of(p, parentZone),
       createFile: (p) => IsolatedFile.of(p, parentZone),
       createLink: (p) => IsolatedLink.of(p, parentZone),
-      stat: (p) => parentZone.runBinary(_stat, directory, p),
-      statSync: (p) => parentZone.runBinary(_statSync, directory, p),
+      stat: (p) =>
+          parentZone.runBinary(_stat, zoneVariables.currentDirectory.path, p),
+      statSync: (p) => parentZone.runBinary(
+          _statSync, zoneVariables.currentDirectory.path, p),
       getCurrentDirectory: () => zoneVariables.currentDirectory,
       setCurrentDirectory: (path) {
         zoneVariables.currentDirectory = parentZone.runUnary(_dir, path);
