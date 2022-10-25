@@ -66,6 +66,41 @@ void main() {
       expect(p.canonicalize(result), p.canonicalize(dir.absolutePath));
     });
 
+    test('Can list Directory children', () async {
+      await Directory(p.join(dir.path, 'a')).create();
+      await Directory(p.join(dir.path, 'a', 'b')).create();
+      await Directory(p.join(dir.path, 'a', 'c')).create();
+      await File(p.join(dir.path, 'a', 't')).create();
+      await File(p.join(dir.path, 'a', 'b', 'v')).create();
+      final result = await withCurrentDirectory(dir.path, () async {
+        final aChildren =
+            await Directory('a').list().map((e) => e.path).toSet();
+        final aChildrenRecursive = await Directory('a')
+            .list(recursive: true)
+            .map((e) => e.path)
+            .toSet();
+        final bChildren = await withCurrentDirectory(
+            'a', () => Directory('b').listSync().map((e) => e.path).toSet());
+        return {
+          'aChildren': aChildren,
+          'aChildrenRecursive': aChildrenRecursive,
+          'bChildren': bChildren,
+        };
+      });
+      expect(
+          result,
+          equals({
+            'aChildren': {p.join('a', 'b'), p.join('a', 'c'), p.join('a', 't')},
+            'aChildrenRecursive': {
+              p.join('a', 'b'),
+              p.join('a', 'c'),
+              p.join('a', 't'),
+              p.join('a', 'b', 'v')
+            },
+            'bChildren': {p.join('b', 'v')},
+          }));
+    });
+
     test('Nested invocations to withCurrentDirectory should work', () async {
       final parentDir = await Directory(p.join(dir.path, 'inner')).create();
       await File(p.join(parentDir.path, 'nested.txt')).create();

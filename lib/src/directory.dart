@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import 'file.dart';
+import 'link.dart';
 import 'utils.dart';
 
 class IsolatedDirectory implements Directory {
@@ -23,7 +25,7 @@ class IsolatedDirectory implements Directory {
   @override
   Directory get absolute {
     final wd = Directory.current.path;
-    return _parentZone.run(() => Directory(p.join(wd, path)));
+    return Zone.root.run(() => Directory(p.join(wd, path)));
   }
 
   @override
@@ -38,13 +40,17 @@ class IsolatedDirectory implements Directory {
   }
 
   @override
-  Future<Directory> createTemp([String? prefix]) {
-    return absolute.createTemp(prefix);
+  Future<Directory> createTemp([String? prefix]) async {
+    final tmp = await absolute.createTemp(prefix);
+    return IsolatedDirectory.of(
+        p.join(path, p.basename(tmp.path)), _parentZone);
   }
 
   @override
   Directory createTempSync([String? prefix]) {
-    return absolute.createTempSync(prefix);
+    final tmp = absolute.createTempSync(prefix);
+    return IsolatedDirectory.of(
+        p.join(path, p.basename(tmp.path)), _parentZone);
   }
 
   @override
@@ -73,14 +79,27 @@ class IsolatedDirectory implements Directory {
 
   @override
   Stream<FileSystemEntity> list(
-      {bool recursive = false, bool followLinks = true}) {
-    return absolute.list(recursive: recursive, followLinks: followLinks);
+      {bool recursive = false, bool followLinks = true}) async* {
+    final abs = absolute;
+    final startIndex = abs.path.length - path.length;
+    await for (final item
+        in abs.list(recursive: recursive, followLinks: followLinks)) {
+      final childPath = item.path.substring(startIndex);
+      yield item.withPath(childPath, _parentZone);
+    }
   }
 
   @override
   List<FileSystemEntity> listSync(
       {bool recursive = false, bool followLinks = true}) {
-    return absolute.listSync(recursive: recursive, followLinks: followLinks);
+    final abs = absolute;
+    final startIndex = abs.path.length - path.length;
+    return abs
+        .listSync(recursive: recursive, followLinks: followLinks)
+        .map((item) {
+      final childPath = item.path.substring(startIndex);
+      return item.withPath(childPath, _parentZone);
+    }).toList();
   }
 
   @override
@@ -125,5 +144,13 @@ class IsolatedDirectory implements Directory {
   Stream<FileSystemEvent> watch(
       {int events = FileSystemEvent.all, bool recursive = false}) {
     return absolute.watch(events: events, recursive: recursive);
+  }
+}
+
+extension _EntityPathExt on FileSystemEntity {
+  FileSystemEntity withPath(String newPath, Zone parentZone) {
+    if (this is File) return IsolatedFile.of(newPath, parentZone);
+    if (this is Directory) return IsolatedDirectory.of(newPath, parentZone);
+    return IsolatedLink.of(newPath, parentZone);
   }
 }
