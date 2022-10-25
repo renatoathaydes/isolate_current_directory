@@ -99,5 +99,13 @@ void main() {
       });
       expect(p.canonicalize(result), p.canonicalize(dir.absolutePath));
     });
+
+    test('Delete error propagates to caller', () async {
+      final resultFuture = withCurrentDirectory(dir.path, () async {
+        final file = File('does-not-exist');
+        await file.delete();
+      });
+      expect(resultFuture, throwsA(isA<FileSystemException>()));
+    });
   });
 }

@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Propagate errors on `Directory.delete` method (it was not awaiting, causing an unhandled exception). 
+
 ## 1.0.1
 
 - Fixed `stat` and `statSync` to use updated Zone's `Directory.current`.

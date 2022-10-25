@@ -97,5 +97,13 @@ void main() {
       expect(result, isTrue);
       expect(await globalCurrentDir, equals(initialCurrentDir));
     });
+
+    test('Delete error propagates to caller', () async {
+      final resultFuture = withCurrentDirectory(dir.path, () async {
+        final directory = Directory('does-not-exist');
+        await directory.delete();
+      });
+      expect(resultFuture, throwsA(isA<FileSystemException>()));
+    });
   });
 }

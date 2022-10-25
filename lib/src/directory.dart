@@ -49,7 +49,7 @@ class IsolatedDirectory implements Directory {
 
   @override
   Future<FileSystemEntity> delete({bool recursive = false}) async {
-    absolute.delete(recursive: recursive);
+    await absolute.delete(recursive: recursive);
     return this;
   }
 
