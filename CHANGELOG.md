@@ -1,3 +1,8 @@
+## 1.2.0
+
+- Upgraded Dart to 2.19.0 (contains breaking changes).
+- Libraries updates.
+
 ## 1.1.0
 
 - Change Directory listing to list relative paths instead of absolute paths.

@@ -42,14 +42,14 @@ class IsolatedFile implements File {
   }
 
   @override
-  Future<File> create({bool recursive = false}) async {
-    await absolute.create(recursive: recursive);
+  Future<File> create({bool recursive = false, bool exclusive = false}) async {
+    await absolute.create(recursive: recursive, exclusive: false);
     return this;
   }
 
   @override
-  void createSync({bool recursive = false}) {
-    absolute.createSync(recursive: recursive);
+  void createSync({bool recursive = false, bool exclusive = false}) {
+    absolute.createSync(recursive: recursive, exclusive: false);
   }
 
   @override

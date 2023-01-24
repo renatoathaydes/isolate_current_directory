@@ -1,16 +1,16 @@
 name: isolate_current_directory
 description: Support for isolated Directory.current.
-version: 1.1.0
+version: 1.2.0
 homepage: https://github.com/renatoathaydes/isolate_current_directory
 
 environment:
-  sdk: '>=2.18.2 <3.0.0'
+  sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
   path: ^1.8.2
 
 dev_dependencies:
-  dartle: ^0.15.0
+  dartle: ^0.18.0
   file: ^6.1.4
   lints: ^2.0.0
   test: ^1.16.0
