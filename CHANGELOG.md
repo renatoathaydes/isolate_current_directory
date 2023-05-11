@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Dart 3.0 requirement.
+
 ## 1.2.0
 
 - Upgraded Dart to 2.19.0 (contains breaking changes).
