@@ -35,5 +35,22 @@ void main() {
         Directory.current = initialCurrentDir;
       }
     });
+
+    test(
+        'Changing the current dir inside withCurrentDirectory '
+        'does not change the outer scope current dir', () async {
+      final initialCurrentDir = Directory.current.path;
+      await Directory(p.join(dir.path, 'my-other-dir')).create();
+      final innerCurrent = await withCurrentDirectory(dir.path, () async {
+        Directory.current = Directory('my-other-dir').absolute.path;
+        await File('hello').writeAsString('foo');
+        return Directory.current.path;
+      });
+      expect(Directory.current.path, equals(initialCurrentDir));
+      expect(innerCurrent, equals(p.join(dir.absolute.path, 'my-other-dir')));
+      expect(
+          await File(p.join(dir.path, 'my-other-dir', 'hello')).readAsString(),
+          equals('foo'));
+    });
   });
 }
