@@ -7,6 +7,8 @@ import 'package:test/test.dart';
 
 import '../test/test_helper.dart';
 
+final pathEquals = Platform.isWindows ? equalsIgnoringCase : equals;
+
 void main() {
   group('Sequential Tests', () {
     late Directory dir;
@@ -46,8 +48,9 @@ void main() {
         await File('hello').writeAsString('foo');
         return Directory.current.path;
       });
-      expect(Directory.current.path, equals(initialCurrentDir));
-      expect(innerCurrent, equals(p.join(dir.absolute.path, 'my-other-dir')));
+      expect(Directory.current.path, pathEquals(initialCurrentDir));
+      expect(
+          innerCurrent, pathEquals(p.join(dir.absolute.path, 'my-other-dir')));
       expect(
           await File(p.join(dir.path, 'my-other-dir', 'hello')).readAsString(),
           equals('foo'));
