@@ -1,6 +1,6 @@
 ## 2.1.0
 
-- Support using `#workingDir` Zone variable to compute working directory.
+- Added `wrapWithCurrentDirectory` function to make it easier to start new Isolates using the current directory.
 - Don't wrap result in `Future` if action given to `withCurrentDirectory` is not async.
 
 ## 2.0.0
