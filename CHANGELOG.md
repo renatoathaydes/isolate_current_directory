@@ -1,6 +1,7 @@
 ## 2.1.0
 
 - Support using `#workingDir` Zone variable to compute working directory.
+- Don't wrap result in `Future` if action given to `withCurrentDirectory` is not async.
 
 ## 2.0.0
 
