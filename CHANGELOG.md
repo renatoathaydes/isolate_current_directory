@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Support using `#workingDir` Zone variable to compute working directory.
+
 ## 2.0.0
 
 - Dart 3.0 requirement.

@@ -21,13 +21,13 @@ import 'src/file.dart';
 import 'src/link.dart';
 import 'src/utils.dart';
 
-class _ZoneVariables {
+const Symbol workingDirZoneKey = #workingDir;
+
+final class _ZoneVariables {
   Directory currentDirectory;
 
   _ZoneVariables(this.currentDirectory);
 }
-
-Directory _dir(String path) => Directory(path);
 
 Future<FileStat> _stat(String dir, String path) {
   return FileStat.stat(absPath(path, dir));
@@ -57,9 +57,9 @@ FileStat _statSync(String dir, String path) {
 FutureOr<T> withCurrentDirectory<T>(
     String directory, FutureOr<T> Function() action) {
   final parentZone = Zone.current;
-  final zoneVariables = _ZoneVariables(_dir(absPath(directory)));
+  final zoneVariables = _ZoneVariables(Directory(absPath(directory)));
 
-  return IOOverrides.runZoned(() async => await action(),
+  return IOOverrides.runZoned(() => action(),
       createDirectory: (p) => IsolatedDirectory.of(p, parentZone),
       createFile: (p) => IsolatedFile.of(p, parentZone),
       createLink: (p) => IsolatedLink.of(p, parentZone),
@@ -69,6 +69,7 @@ FutureOr<T> withCurrentDirectory<T>(
           _statSync, zoneVariables.currentDirectory.path, p),
       getCurrentDirectory: () => zoneVariables.currentDirectory,
       setCurrentDirectory: (path) {
-        zoneVariables.currentDirectory = parentZone.runUnary(_dir, path);
+        zoneVariables.currentDirectory =
+            parentZone.runUnary(Directory.new, path);
       });
 }
