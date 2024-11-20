@@ -16,6 +16,32 @@ void main() {
       dir = await dirFuture;
     });
 
+    test('Can check directory exists sync', () async {
+      final directory = Directory(p.join(dir.path, 'my-dir'));
+      await directory.create();
+      expect(
+          withCurrentDirectory(
+              dir.path, () => Directory('my-dir').existsSync()),
+          isTrue);
+      expect(
+          withCurrentDirectory(
+              dir.path, () => Directory('other-dir').existsSync()),
+          isFalse);
+    });
+
+    test('Can check directory exists async without await', () async {
+      final directory = Directory(p.join(dir.path, 'my-dir'));
+      await directory.create();
+      expect(
+          await withCurrentDirectory(
+              dir.path, () async => Directory('my-dir').exists()),
+          isTrue);
+      expect(
+          await withCurrentDirectory(
+              dir.path, () => Directory('my-dir').exists()),
+          isTrue);
+    });
+
     test('Can create, check dir exists', () async {
       final result = await withCurrentDirectory(dir.path, () async {
         final directory = Directory('hello');
