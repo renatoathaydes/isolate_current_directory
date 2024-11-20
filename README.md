@@ -63,6 +63,24 @@ For this reason, when using `Process`, you must pass in the `workingDirectory` a
 Process.start('cmd', const ['args'], workingDirectory: Directory.current.path);
 ```
 
+### Isolates
+
+When starting a new Isolate, unfortunately, the new Isolate will not inherit the scoped current directory of the
+calling code.
+
+To work around that, wrap Isolate functions as follows:
+
+```dart
+// BEFORE
+Isolate.run(myIsolateFunction);
+
+// AFTER
+// capture the working directory in this Isolate
+final workingDir = Directory.current.path;
+// in the new Isolate, use withCurrentDirectory
+Isolate.run(() => withCurrentDirectory(workingDir, myIsolateFunction));  
+```
+
 ### Performance
 
 Another possible issue is performance. When a `FileSystemEntity` is created within the scope of `withCurrentDirectory`,

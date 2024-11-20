@@ -21,14 +21,6 @@ import 'src/file.dart';
 import 'src/link.dart';
 import 'src/utils.dart';
 
-class _ZoneVariables {
-  Directory currentDirectory;
-
-  _ZoneVariables(this.currentDirectory);
-}
-
-Directory _dir(String path) => Directory(path);
-
 Future<FileStat> _stat(String dir, String path) {
   return FileStat.stat(absPath(path, dir));
 }
@@ -57,18 +49,35 @@ FileStat _statSync(String dir, String path) {
 FutureOr<T> withCurrentDirectory<T>(
     String directory, FutureOr<T> Function() action) {
   final parentZone = Zone.current;
-  final zoneVariables = _ZoneVariables(_dir(absPath(directory)));
+  var zoneDir = Directory(absPath(directory));
 
-  return IOOverrides.runZoned(() async => await action(),
+  return IOOverrides.runZoned(() => action(),
       createDirectory: (p) => IsolatedDirectory.of(p, parentZone),
       createFile: (p) => IsolatedFile.of(p, parentZone),
       createLink: (p) => IsolatedLink.of(p, parentZone),
-      stat: (p) =>
-          parentZone.runBinary(_stat, zoneVariables.currentDirectory.path, p),
-      statSync: (p) => parentZone.runBinary(
-          _statSync, zoneVariables.currentDirectory.path, p),
-      getCurrentDirectory: () => zoneVariables.currentDirectory,
+      stat: (p) => parentZone.runBinary(_stat, zoneDir.path, p),
+      statSync: (p) => parentZone.runBinary(_statSync, zoneDir.path, p),
+      getCurrentDirectory: () => zoneDir,
       setCurrentDirectory: (path) {
-        zoneVariables.currentDirectory = parentZone.runUnary(_dir, path);
+        zoneDir = parentZone.runUnary(Directory.new, path);
       });
+}
+
+/// Wrap an existing function so that the returned function calls
+/// [withCurrentDirectory] around it using `Directory.current.path`.
+///
+/// This is normally used to wrap functions meant to run on another Isolate
+/// because this allows "propagating" the current directory between Isolates.
+///
+/// ## Example:
+/// ```
+/// // BEFORE
+/// Isolate.run(readTextFile);
+///
+/// // AFTER
+/// Isolate.run(wrapWithCurrentDirectory(readTextFile));
+/// ```
+FutureOr<T> Function() wrapWithCurrentDirectory<T>(FutureOr<T> Function() fun) {
+  final workingDir = Directory.current.path;
+  return () => withCurrentDirectory(workingDir, fun);
 }

@@ -1,3 +1,8 @@
+## 2.1.0
+
+- Added `wrapWithCurrentDirectory` function to make it easier to start new Isolates using the current directory.
+- Don't wrap result in `Future` if action given to `withCurrentDirectory` is not async.
+
 ## 2.0.0
 
 - Dart 3.0 requirement.

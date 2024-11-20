@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:isolate_current_directory/isolate_current_directory.dart';
 import 'package:path/path.dart' as p;
@@ -14,6 +15,32 @@ void main() {
 
     setUpAll(() async {
       dir = await dirFuture;
+    });
+
+    test('Can check directory exists sync', () async {
+      final directory = Directory(p.join(dir.path, 'my-dir'));
+      await directory.create();
+      expect(
+          withCurrentDirectory(
+              dir.path, () => Directory('my-dir').existsSync()),
+          isTrue);
+      expect(
+          withCurrentDirectory(
+              dir.path, () => Directory('other-dir').existsSync()),
+          isFalse);
+    });
+
+    test('Can check directory exists async without await', () async {
+      final directory = Directory(p.join(dir.path, 'my-dir'));
+      await directory.create();
+      expect(
+          await withCurrentDirectory(
+              dir.path, () async => Directory('my-dir').exists()),
+          isTrue);
+      expect(
+          await withCurrentDirectory(
+              dir.path, () => Directory('my-dir').exists()),
+          isTrue);
     });
 
     test('Can create, check dir exists', () async {
@@ -140,5 +167,21 @@ void main() {
       });
       expect(resultFuture, throwsA(isA<FileSystemException>()));
     });
+
+    test('Can use wrapWithCurrentDirectory in Isolate', () async {
+      await File(p.join(dir.path, textFileName)).writeAsString('hello');
+      await withCurrentDirectory(dir.path, () async {
+        // even though we're inside withCurrentDirectory, the Isolate doesn't know it
+        expect(() => Isolate.run(readTextFile),
+            throwsA(isA<PathNotFoundException>()));
+        // but when wrapping it into a Zone, it works
+        expect(await Isolate.run(wrapWithCurrentDirectory(readTextFile)),
+            equals('hello'));
+      });
+    });
   });
 }
+
+const textFileName = 'some-random-text-file.txt';
+
+Future<String> readTextFile() => File(textFileName).readAsString();
