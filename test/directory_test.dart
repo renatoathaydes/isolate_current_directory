@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:isolate_current_directory/isolate_current_directory.dart';
 import 'package:path/path.dart' as p;
@@ -140,25 +141,6 @@ void main() {
       expect(result, isTrue);
     });
 
-    test('Setting workingDir Zone variable can replace withCurrentDirectory',
-        () async {
-      final parentDir = await Directory(p.join(dir.path, 'inner')).create();
-      await File(p.join(parentDir.path, 'nested.txt')).create();
-
-      final result = await runZoned(() async {
-        return await withCurrentDirectory('inner', () async {
-          final file = File('nested.txt');
-          return (exists: await file.exists(), absPath: file.absolutePath);
-        });
-      }, zoneValues: {workingDirZoneKey: dir.path});
-      expect(
-          result,
-          equals((
-            exists: true,
-            absPath: p.join(dir.absolutePath, 'inner', 'nested.txt')
-          )));
-    });
-
     test('Can change current Directory within withCurrentDirectory', () async {
       final initialCurrentDir = Directory.current.path;
       final lock = StreamController();
@@ -185,5 +167,21 @@ void main() {
       });
       expect(resultFuture, throwsA(isA<FileSystemException>()));
     });
+
+    test('Can use wrapWithCurrentDirectory in Isolate', () async {
+      await File(p.join(dir.path, textFileName)).writeAsString('hello');
+      await withCurrentDirectory(dir.path, () async {
+        // even though we're inside withCurrentDirectory, the Isolate doesn't know it
+        expect(() => Isolate.run(readTextFile),
+            throwsA(isA<PathNotFoundException>()));
+        // but when wrapping it into a Zone, it works
+        expect(await Isolate.run(wrapWithCurrentDirectory(readTextFile)),
+            equals('hello'));
+      });
+    });
   });
 }
+
+const textFileName = 'some-random-text-file.txt';
+
+Future<String> readTextFile() => File(textFileName).readAsString();

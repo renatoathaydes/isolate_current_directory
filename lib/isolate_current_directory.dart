@@ -21,8 +21,6 @@ import 'src/file.dart';
 import 'src/link.dart';
 import 'src/utils.dart';
 
-const Symbol workingDirZoneKey = #workingDir;
-
 final class _ZoneVariables {
   Directory currentDirectory;
 
@@ -72,4 +70,23 @@ FutureOr<T> withCurrentDirectory<T>(
         zoneVariables.currentDirectory =
             parentZone.runUnary(Directory.new, path);
       });
+}
+
+/// Wrap an existing function so that the returned function calls
+/// [withCurrentDirectory] around it using `Directory.current.path`.
+///
+/// This is normally used to wrap functions meant to run on another Isolate
+/// because this allows "propagating" the current directory between Isolates.
+///
+/// ## Example:
+/// ```
+/// // BEFORE
+/// Isolate.run(readTextFile);
+///
+/// // AFTER
+/// Isolate.run(wrapWithCurrentDirectory(readTextFile));
+/// ```
+FutureOr<T> Function() wrapWithCurrentDirectory<T>(FutureOr<T> Function() fun) {
+  final workingDir = Directory.current.path;
+  return () => withCurrentDirectory(workingDir, fun);
 }
