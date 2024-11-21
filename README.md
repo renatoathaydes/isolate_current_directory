@@ -3,12 +3,12 @@
 ![GitHub Actions](https://github.com/renatoathaydes/isolate_current_directory/workflows/CI/badge.svg)
 [![pub package](https://img.shields.io/pub/v/isolate_current_directory.svg)](https://pub.dev/packages/isolate_current_directory)
 
-This library exports a single function, `withCurrentDirectory`, which can
+This library exports the `withCurrentDirectory` function, which can
 change [`Directory.current`](https://api.dart.dev/stable/2.18.3/dart-io/Directory/current.html)
 (the working directory) within the scope of a lambda, but not the global value.
 
 That means that using this function, it's possible to write concurrent Dart code that executes in different
-working directories without different computations affecting each other.
+working directories without different scopes affecting each other.
 
 ## Using this library
 
@@ -68,17 +68,14 @@ Process.start('cmd', const ['args'], workingDirectory: Directory.current.path);
 When starting a new Isolate, unfortunately, the new Isolate will not inherit the scoped current directory of the
 calling code.
 
-To work around that, wrap Isolate functions as follows:
+To work around that, wrap Isolate functions using `wrapWithCurrentDirectory` as follows:
 
 ```dart
 // BEFORE
 Isolate.run(myIsolateFunction);
 
 // AFTER
-// capture the working directory in this Isolate
-final workingDir = Directory.current.path;
-// in the new Isolate, use withCurrentDirectory
-Isolate.run(() => withCurrentDirectory(workingDir, myIsolateFunction));  
+Isolate.run(wrapWithCurrentDirectory(myIsolateFunction));  
 ```
 
 ### Performance
