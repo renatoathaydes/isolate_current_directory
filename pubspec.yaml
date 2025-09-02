@@ -1,6 +1,6 @@
 name: isolate_current_directory
 description: Support for isolated Directory.current. Use the `withCurrentDirectory` function to change the Dart current directory within a scope without affecting the global one.
-version: 2.1.0
+version: 2.2.0
 homepage: https://github.com/renatoathaydes/isolate_current_directory
 
 environment:

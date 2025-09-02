@@ -160,12 +160,46 @@ void main() {
       expect(await globalCurrentDir, equals(initialCurrentDir));
     });
 
-    test('Delete error propagates to caller', () async {
+    test('Delete error propagates to caller', () {
       final resultFuture = withCurrentDirectory(dir.path, () async {
         final directory = Directory('does-not-exist');
         await directory.delete();
       });
       expect(resultFuture, throwsA(isA<FileSystemException>()));
+    });
+
+    test('Delete error propagates to caller (with error wrapper)', () {
+      final resultFuture = withCurrentDirectory(dir.path,
+          onError: (e) => throw {'error': e}, () async {
+        final directory = Directory('does-not-exist');
+        return await directory.delete();
+      });
+
+      expect(
+          resultFuture,
+          throwsA(isA<Map<String, dynamic>>().having(
+              (m) => m['error'], 'has error key', isA<FileSystemException>())));
+    });
+
+    test('Can recover from error using onError callback (sync)', () {
+      final result = withCurrentDirectory(dir.path, onError: (_) => 10, () {
+        if (Directory('does-not-exist').existsSync()) {
+          return 42;
+        }
+        throw Exception('FAIL');
+      });
+      expect(result, equals(10));
+    });
+
+    test('Can recover from error using onError callback (async)', () async {
+      final resultFuture =
+          withCurrentDirectory(dir.path, onError: (_) => 11, () async {
+        if (await Directory('does-not-exist').exists()) {
+          return 42;
+        }
+        throw Exception('FAIL');
+      });
+      expect(await resultFuture, equals(11));
     });
 
     test('Can use wrapWithCurrentDirectory in Isolate', () async {

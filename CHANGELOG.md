@@ -1,3 +1,8 @@
+## 2.2.0
+
+- added the `onError` optional argument to `withCurrentDirectory`.
+- added the `onError` optional argument to `wrapWithCurrentDirectory`.
+
 ## 2.1.0
 
 - Added `wrapWithCurrentDirectory` function to make it easier to start new Isolates using the current directory.
