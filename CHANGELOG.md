@@ -1,3 +1,8 @@
+## 2.2.1
+
+- fixed mistake in `absPath` function: use `normalize`, not `canonicalize`.
+  The latter causes errors on Windows since it downcases the full path, including the driver. 
+
 ## 2.2.0
 
 - added the `onError` optional argument to `withCurrentDirectory`.
